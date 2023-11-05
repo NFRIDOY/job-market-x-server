@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require("dotenv").config();
 
 // init
@@ -55,10 +55,10 @@ async function run() {
         app.get('/api/v1/myPostedJobs', async (req, res) => {
             try {
                 const queryEmail = req.query.email;
-                console.log(queryEmail)
+                // console.log(queryEmail)
                 let query = {};
-                if(req.query.email) {
-                    query = {email: queryEmail};
+                if (req.query.email) {
+                    query = { email: queryEmail };
                     let result = await jobsCollection.find(query).toArray();
                     res.send(result)
                 }
@@ -66,6 +66,28 @@ async function run() {
                     result = await jobsCollection.find(query).toArray();
                     res.send(result)
                 }
+            } catch (error) {
+                console.log("error On /api/v1/myPostedJobs")
+                console.log(error)
+            }
+        })
+        // Find Update Job by ID
+        app.get('/api/v1/myPostedJobs/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                console.log(id)
+                // const queryEmail = req.query.email;
+                // console.log(queryEmail)
+                let query = { _id: new ObjectId(id) };
+                // if(req.query.email) {
+                //     query = {email: queryEmail};
+                //     let result = await jobsCollection.findOne(query).toArray();
+                //     res.send(result)
+                // }
+                // else {
+                result = await jobsCollection.findOne(query).toArray();
+                res.send(result)
+                // }
             } catch (error) {
                 console.log("error On /api/v1/myPostedJobs")
                 console.log(error)
