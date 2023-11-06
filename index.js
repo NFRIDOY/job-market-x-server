@@ -45,7 +45,7 @@ async function run() {
                 console.log(queryEmail)
                 let query = {};
                 if (req.query.email) {
-                    query = { email: {$ne: queryEmail} };
+                    query = { email: { $ne: queryEmail } };
                     let result = await jobsCollection.find(query).toArray();
                     res.send(result)
                 }
@@ -53,6 +53,28 @@ async function run() {
                     result = await jobsCollection.find(query).toArray();
                     res.send(result)
                 }
+            } catch (error) {
+                console.log("error On /api/v1/myPostedJobs")
+                console.log(error)
+            }
+        })
+
+        // // Get a Job Details Page // Dynamic route
+        app.get('/api/v1/allJobs/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                const queryEmail = req.query.email;
+                console.log(queryEmail)
+                let query = { _id: new ObjectId(id) };
+                // if (req.query.email) {
+                //     query = { email: {$ne: queryEmail} };
+                //     let result = await jobsCollection.find(query).toArray();
+                //     res.send(result)
+                // }
+                // else {
+                result = await jobsCollection.findOne(query);
+                res.send(result)
+                // }
             } catch (error) {
                 console.log("error On /api/v1/myPostedJobs")
                 console.log(error)
