@@ -39,25 +39,25 @@ async function run() {
         const jobsCollection = database.collection("Jobs")
 
         // // Get user All Posted Jobs
-        // app.get('/api/v1/jobs', async (req, res) => {
-        //     try {
-        //         const queryEmail = req.query.email;
-        //         // console.log(queryEmail)
-        //         let query = {};
-        //         if (req.query.email) {
-        //             query = { email: queryEmail };
-        //             let result = await jobsCollection.find(query).toArray();
-        //             res.send(result)
-        //         }
-        //         else {
-        //             result = await jobsCollection.find(query).toArray();
-        //             res.send(result)
-        //         }
-        //     } catch (error) {
-        //         console.log("error On /api/v1/myPostedJobs")
-        //         console.log(error)
-        //     }
-        // })
+        app.get('/api/v1/allJobs', async (req, res) => {
+            try {
+                const queryEmail = req.query.email;
+                console.log(queryEmail)
+                let query = {};
+                if (req.query.email) {
+                    query = { email: {$ne: queryEmail} };
+                    let result = await jobsCollection.find(query).toArray();
+                    res.send(result)
+                }
+                else {
+                    result = await jobsCollection.find(query).toArray();
+                    res.send(result)
+                }
+            } catch (error) {
+                console.log("error On /api/v1/myPostedJobs")
+                console.log(error)
+            }
+        })
 
         // ADD PRODUCTS
         // http://localhost:5000/api/v1/addJobs
