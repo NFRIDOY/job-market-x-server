@@ -55,7 +55,7 @@ async function run() {
                     res.send(result)
                 }
             } catch (error) {
-                console.log("error On /api/v1/myPostedJobs")
+                console.log("error On /api/v1/AllJobs")
                 console.log(error)
             }
         })
@@ -77,7 +77,7 @@ async function run() {
                 res.send(result)
                 // }
             } catch (error) {
-                console.log("error On /api/v1/myPostedJobs")
+                console.log("error On /api/v1/allJobs")
                 console.log(error)
             }
         })
@@ -120,7 +120,7 @@ async function run() {
         app.get('/api/v1/myPostedJobs/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                console.log(id)
+                // console.log(id)
                 // const queryEmail = req.query.email;
                 // console.log(queryEmail)
                 let query = { _id: new ObjectId(id) };
@@ -130,11 +130,61 @@ async function run() {
                 //     res.send(result)
                 // }
                 // else {
-                result = await jobsCollection.findOne(query).toArray();
+                result = await jobsCollection.findOne(query);
                 res.send(result)
                 // }
             } catch (error) {
-                console.log("error On /api/v1/myPostedJobs")
+                console.log("error On Get /api/v1/myPostedJobs")
+                console.log(error)
+            }
+        })
+
+        // put My Posted Job by ID
+        app.put('/api/v1/myPostedJobs/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                const updateJob = req.body;
+                // console.log(id)
+                // console.log(updateJob)
+                // const queryEmail = req.query.email;
+                // console.log(queryEmail)
+                // let query = { _id: new ObjectId(id) };
+
+                const filter = { _id: new ObjectId(id) };
+                const options = { upsert: true };
+                job = {
+                    $set: {
+                        jobTitle: updateJob.jobTitle,
+                        deadline: updateJob.deadline,
+                        description: updateJob.description,
+                        category: updateJob.category,
+                        minPrice: updateJob.minPrice,
+                        maxPrice: updateJob.maxPrice,
+                    },
+                };
+
+                result = await jobsCollection.updateOne(filter, job, options);
+                res.send(result)
+            } catch (error) {
+                console.log("error On Update/PUT /api/v1/myPostedJobs")
+                console.log(error)
+            }
+        })
+
+
+        // Delete My Posted Job by ID
+        app.delete('/api/v1/myPostedJobs/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                console.log(id)
+                // const queryEmail = req.query.email;
+                // console.log(queryEmail)
+                let query = { _id: new ObjectId(id) };
+
+                result = await jobsCollection.deleteOne(query);
+                res.send(result)
+            } catch (error) {
+                console.log("error On Delete /api/v1/myPostedJobs")
                 console.log(error)
             }
         })
@@ -147,7 +197,7 @@ async function run() {
                 const result = await bidCollection.insertOne(newBid);
                 res.send(result)
             } catch (error) {
-                console.log("error On /api/v1/addJobs")
+                console.log("error On Post /api/v1/myBids")
                 console.log(error)
             }
         })
@@ -156,19 +206,49 @@ async function run() {
         app.get('/api/v1/myBids', async (req, res) => {
             try {
                 const queryBidEmail = req.query.email;
-                // console.log(queryEmail)
+                const isReq = req.query?.isReq;
+                // console.log(isReq)
+                // console.log(true)
                 let query = {};
-                if (req.query.email) {
-                    query = { emailEmpForm: queryBidEmail };
+                if (req.query.email && isReq != 1) {
+                    query = { emailBidForm: queryBidEmail };
                     let result = await bidCollection.find(query).toArray();
                     res.send(result)
                 }
-                else {
+                else if( req.query.email && isReq == 1) {
+                    query = { emailOwnerForm: queryBidEmail };
                     result = await bidCollection.find(query).toArray();
                     res.send(result)
                 }
             } catch (error) {
-                console.log("error On /api/v1/addBid")
+                console.log("error On Get /api/v1/myBids")
+                console.log(error)
+            }
+        })
+
+        app.put('/api/v1/myBids/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                const {status} = req.body;
+                // const updateStatus = req.body;
+                console.log(status)
+                // console.log(id)
+                // const queryEmail = req.query.email;
+                // console.log(queryEmail)
+                // let query = { _id: new ObjectId(id) };
+
+                const filter = { _id: new ObjectId(id) };
+                const options = { upsert: true };
+                job = {
+                    $set: {
+                        status: status,
+                    }
+                };
+
+                result = await bidCollection.updateOne(filter, job, options);
+                res.send(result)
+            } catch (error) {
+                console.log("error On Update/PUT /api/v1/myBids/:id")
                 console.log(error)
             }
         })
