@@ -37,6 +37,7 @@ async function run() {
         // Operations
         const database = client.db("JobMarketXDB");
         const jobsCollection = database.collection("Jobs")
+        const bidCollection = database.collection("MyBids")
 
         // // Get user All Posted Jobs
         app.get('/api/v1/allJobs', async (req, res) => {
@@ -94,6 +95,7 @@ async function run() {
                 console.log(error)
             }
         })
+
         // Get user Posted Jobs
         app.get('/api/v1/myPostedJobs', async (req, res) => {
             try {
@@ -133,6 +135,40 @@ async function run() {
                 // }
             } catch (error) {
                 console.log("error On /api/v1/myPostedJobs")
+                console.log(error)
+            }
+        })
+
+        // http://localhost:5000/api/v1/addBid
+        app.post('/api/v1/myBids', async (req, res) => {
+            try {
+                const newBid = req.body;
+                // console.log(newBid)
+                const result = await bidCollection.insertOne(newBid);
+                res.send(result)
+            } catch (error) {
+                console.log("error On /api/v1/addJobs")
+                console.log(error)
+            }
+        })
+
+        // http://localhost:5000/api/v1/myBid
+        app.get('/api/v1/myBids', async (req, res) => {
+            try {
+                const queryBidEmail = req.query.email;
+                // console.log(queryEmail)
+                let query = {};
+                if (req.query.email) {
+                    query = { emailEmpForm: queryBidEmail };
+                    let result = await bidCollection.find(query).toArray();
+                    res.send(result)
+                }
+                else {
+                    result = await bidCollection.find(query).toArray();
+                    res.send(result)
+                }
+            } catch (error) {
+                console.log("error On /api/v1/addBid")
                 console.log(error)
             }
         })
