@@ -2,6 +2,8 @@ const express = require('express')
 const cors = require('cors')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require("dotenv").config();
+const jwt = require("jsonwebtoken"); // npm install jsonwebtoken
+const cookieParser = require("cookie-parser"); // npm install cookie-parser
 
 // init
 const app = express()
@@ -11,10 +13,11 @@ const port = process.env.PORT || 5000;
 // app.use(cors());
 app.use(cors({
     origin: ["https://job-market-x.web.app", "http://localhost:5173", "http://localhost:5174"],
-    // credentials: true
+    credentials: true
 }));
 app.use(express.json());
 // app.use(express.json());
+app.use(cookieParser())
 
 // MongoDB
 // console.log(process.env.DB_USER)
@@ -40,6 +43,32 @@ async function run() {
         const database = client.db("JobMarketXDB");
         const jobsCollection = database.collection("Jobs")
         const bidCollection = database.collection("MyBids")
+
+        // jwt
+        app.post("/jwt", async (req, res) => {
+            try {
+                const user = req.body;
+                console.log(user)
+                const token = await jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
+                    {
+                        expiresIn: '1h'
+                    }
+                )
+
+                console.log("token", token)
+
+
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+
+                })
+                    .send({ message: 'true' })
+            } catch (error) {
+                console.log(error)
+            }
+        })
 
         // // Get user All Posted Jobs
         app.get('/api/v1/allJobs', async (req, res) => {
@@ -217,7 +246,7 @@ async function run() {
                     let result = await bidCollection.find(query).toArray();
                     res.send(result)
                 }
-                else if( req.query.email && isReq == 1) {
+                else if (req.query.email && isReq == 1) {
                     query = { emailOwnerForm: queryBidEmail };
                     result = await bidCollection.find(query).toArray();
                     res.send(result)
@@ -231,7 +260,7 @@ async function run() {
         app.put('/api/v1/myBids/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                const {status} = req.body;
+                const { status } = req.body;
                 // const updateStatus = req.body;
                 // console.log(status)
                 // console.log(id)
