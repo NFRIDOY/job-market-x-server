@@ -24,7 +24,7 @@ app.use(cookieParser())
 const verifyToken = async (req, res, next) => {
     const token = req.cookies?.token;
 
-    console.log(req.cookie);
+    console.log(req.cookies);
     if (!token) {
         return res.status(401).send({ message: 'Unauthorized Access, No Token' })
     }
@@ -34,6 +34,8 @@ const verifyToken = async (req, res, next) => {
             return res.status(401).send({ message: 'Unauthorized Access' })
         }
         console.log("verifyToken: verify")
+        console.log("decoded", decoded)
+
         req.user = decoded;
         next()
     })
@@ -88,6 +90,13 @@ async function run() {
             } catch (error) {
                 console.log(error)
             }
+        })
+
+        // Logout 
+
+        app.post('/api/v1/logout', async (req, res) => {
+            const user = req.body;
+            res.clearCookie('token', { maxAge: 0 }).send({ success: true })
         })
 
         // // Get user All Posted Jobs
@@ -151,7 +160,7 @@ async function run() {
         app.get('/api/v1/myPostedJobs', verifyToken, async (req, res) => {
             try {
                 const queryEmail = req.query.email;
-                // console.log(queryEmail)
+                console.log(req.user)
                 let query = {};
                 if (req.query.email) {
                     query = { email: queryEmail };
@@ -244,7 +253,7 @@ async function run() {
         app.post('/api/v1/myBids', verifyToken, async (req, res) => {
             try {
                 const newBid = req.body;
-                // console.log(newBid)
+                console.log(req.user)
                 const result = await bidCollection.insertOne(newBid);
                 res.send(result)
             } catch (error) {
