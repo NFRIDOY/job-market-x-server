@@ -13,6 +13,7 @@ const port = process.env.PORT || 5000;
 // app.use(cors());
 app.use(cors({
     origin: ["https://job-market-x.web.app", "http://localhost:5173", "http://localhost:5174"],
+    // origin: ["https://job-market-x.web.app"],
     credentials: true
 }));
 app.use(express.json());
@@ -23,20 +24,23 @@ app.use(cookieParser())
 
 const verifyToken = async (req, res, next) => {
     const token = req.cookies?.token;
+    const emailReq = req.query.email;
 
-    console.log(req.cookies);
+    console.log(token);
     if (!token) {
         return res.status(401).send({ message: 'Unauthorized Access, No Token' })
     }
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err) {
-
             return res.status(401).send({ message: 'Unauthorized Access' })
         }
         console.log("verifyToken: verify")
         console.log("decoded", decoded)
-
         req.user = decoded;
+        // if (req.user.email === emailReq) {
+        //     return res.status(403).send({ message: 'Forbiden Access' })
+        // }
+
         next()
     })
 }
@@ -103,7 +107,7 @@ async function run() {
         app.get('/api/v1/allJobs', async (req, res) => {
             try {
                 const queryEmail = req.query.email;
-                // console.log(queryEmail)
+                console.log(queryEmail)
                 let query = {};
                 if (req.query.email) {
                     query = { email: { $ne: queryEmail } };
@@ -157,11 +161,16 @@ async function run() {
         })
 
         // Get user Posted Jobs
+        // app.get('/api/v1/myPostedJobs', async (req, res) => {
         app.get('/api/v1/myPostedJobs', verifyToken, async (req, res) => {
             try {
                 const queryEmail = req.query.email;
                 console.log(req.user)
                 let query = {};
+
+                if (req.user.email !== queryEmail) {
+                    return res.status(403).send({ message: 'Forbiden Access' })
+                }
                 if (req.query.email) {
                     query = { email: queryEmail };
                     let result = await jobsCollection.find(query).toArray();
@@ -250,7 +259,8 @@ async function run() {
         })
 
         // http://localhost:5000/api/v1/addBid
-        app.post('/api/v1/myBids', verifyToken, async (req, res) => {
+        // app.post('/api/v1/myBids', verifyToken, async (req, res) => {
+        app.post('/api/v1/myBids', async (req, res) => {
             try {
                 const newBid = req.body;
                 console.log(req.user)
@@ -263,7 +273,8 @@ async function run() {
         })
 
         // http://localhost:5000/api/v1/myBid
-        app.get('/api/v1/myBids', verifyToken, async (req, res) => {
+        // app.get('/api/v1/myBids', verifyToken, async (req, res) => {
+        app.get('/api/v1/myBids', async (req, res) => {
             try {
                 const queryBidEmail = req.query.email;
                 const isReq = req.query?.isReq;
