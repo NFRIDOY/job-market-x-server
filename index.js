@@ -43,7 +43,7 @@ async function run() {
         app.get('/api/v1/allJobs', async (req, res) => {
             try {
                 const queryEmail = req.query.email;
-                console.log(queryEmail)
+                // console.log(queryEmail)
                 let query = {};
                 if (req.query.email) {
                     query = { email: { $ne: queryEmail } };
@@ -65,7 +65,7 @@ async function run() {
             try {
                 const id = req.params.id;
                 const queryEmail = req.query.email;
-                console.log(queryEmail)
+                // console.log(queryEmail)
                 let query = { _id: new ObjectId(id) };
                 // if (req.query.email) {
                 //     query = { email: {$ne: queryEmail} };
@@ -87,7 +87,7 @@ async function run() {
         app.post('/api/v1/addJobs', async (req, res) => {
             try {
                 const newJob = req.body;
-                console.log(newJob)
+                // console.log(newJob)
                 const result = await jobsCollection.insertOne(newJob);
                 res.send(result)
             } catch (error) {
@@ -231,7 +231,7 @@ async function run() {
                 const id = req.params.id;
                 const {status} = req.body;
                 // const updateStatus = req.body;
-                console.log(status)
+                // console.log(status)
                 // console.log(id)
                 // const queryEmail = req.query.email;
                 // console.log(queryEmail)
