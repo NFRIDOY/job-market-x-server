@@ -19,6 +19,26 @@ app.use(express.json());
 // app.use(express.json());
 app.use(cookieParser())
 
+// Verify
+
+const verifyToken = async (req, res, next) => {
+    const token = req.cookies?.token;
+
+    console.log(req.cookie);
+    if (!token) {
+        return res.status(401).send({ message: 'Unauthorized Access, No Token' })
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+
+            return res.status(401).send({ message: 'Unauthorized Access' })
+        }
+        console.log("verifyToken: verify")
+        req.user = decoded;
+        next()
+    })
+}
+
 // MongoDB
 // console.log(process.env.DB_USER)
 // console.log(process.env.DB_PASS)
@@ -128,7 +148,7 @@ async function run() {
         })
 
         // Get user Posted Jobs
-        app.get('/api/v1/myPostedJobs', async (req, res) => {
+        app.get('/api/v1/myPostedJobs', verifyToken, async (req, res) => {
             try {
                 const queryEmail = req.query.email;
                 // console.log(queryEmail)
@@ -221,7 +241,7 @@ async function run() {
         })
 
         // http://localhost:5000/api/v1/addBid
-        app.post('/api/v1/myBids', async (req, res) => {
+        app.post('/api/v1/myBids', verifyToken, async (req, res) => {
             try {
                 const newBid = req.body;
                 // console.log(newBid)
@@ -234,7 +254,7 @@ async function run() {
         })
 
         // http://localhost:5000/api/v1/myBid
-        app.get('/api/v1/myBids', async (req, res) => {
+        app.get('/api/v1/myBids', verifyToken, async (req, res) => {
             try {
                 const queryBidEmail = req.query.email;
                 const isReq = req.query?.isReq;
