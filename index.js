@@ -45,7 +45,7 @@ async function run() {
         const bidCollection = database.collection("MyBids")
 
         // jwt
-        app.post("/jwt", async (req, res) => {
+        app.post("/api/v1/jwt", async (req, res) => {
             try {
                 const user = req.body;
                 console.log(user)
