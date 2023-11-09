@@ -125,7 +125,7 @@ async function run() {
         })
 
         // // Get a Job Details Page // Dynamic route
-        app.get('/api/v1/allJobs/:id', async (req, res) => {
+        app.get('/api/v1/allJobs/:id', verifyToken, async (req, res) => {
             try {
                 const id = req.params.id;
                 const queryEmail = req.query.email;
@@ -148,7 +148,7 @@ async function run() {
 
         // ADD PRODUCTS
         // http://localhost:5000/api/v1/addJobs
-        app.post('/api/v1/addJobs', async (req, res) => {
+        app.post('/api/v1/addJobs', verifyToken, async (req, res) => {
             try {
                 const newJob = req.body;
                 // console.log(newJob)
@@ -164,10 +164,10 @@ async function run() {
         // app.get('/api/v1/myPostedJobs', async (req, res) => {
         app.get('/api/v1/myPostedJobs', verifyToken, async (req, res) => {
             try {
-                const queryEmail = req.query.email;
                 console.log(req.user)
                 let query = {};
 
+                const queryEmail = req.query.email;
                 if (req.user.email !== queryEmail) {
                     return res.status(403).send({ message: 'Forbiden Access' })
                 }
@@ -186,12 +186,15 @@ async function run() {
             }
         })
         // Find Update Job by ID
-        app.get('/api/v1/myPostedJobs/:id', async (req, res) => {
+        app.get('/api/v1/myPostedJobs/:id', verifyToken, async (req, res) => {
             try {
                 const id = req.params.id;
                 // console.log(id)
-                // const queryEmail = req.query.email;
+                const queryEmail = req.query.email;
                 // console.log(queryEmail)
+                if (req.user.email !== queryEmail) {
+                    return res.status(403).send({ message: 'Forbiden Access' })
+                }
                 let query = { _id: new ObjectId(id) };
                 // if(req.query.email) {
                 //     query = {email: queryEmail};
@@ -209,7 +212,7 @@ async function run() {
         })
 
         // put My Posted Job by ID
-        app.put('/api/v1/myPostedJobs/:id', async (req, res) => {
+        app.put('/api/v1/myPostedJobs/:id', verifyToken, async (req, res) => {
             try {
                 const id = req.params.id;
                 const updateJob = req.body;
@@ -242,12 +245,16 @@ async function run() {
 
 
         // Delete My Posted Job by ID
-        app.delete('/api/v1/myPostedJobs/:id', async (req, res) => {
+        app.delete('/api/v1/myPostedJobs/:id', verifyToken, async (req, res) => {
             try {
                 const id = req.params.id;
                 console.log(id)
                 // const queryEmail = req.query.email;
                 // console.log(queryEmail)
+                const queryEmail = req.query.email;
+                if (req.user.email !== queryEmail) {
+                    return res.status(403).send({ message: 'Forbiden Access' })
+                }
                 let query = { _id: new ObjectId(id) };
 
                 result = await jobsCollection.deleteOne(query);
@@ -260,10 +267,15 @@ async function run() {
 
         // http://localhost:5000/api/v1/addBid
         // app.post('/api/v1/myBids', verifyToken, async (req, res) => {
-        app.post('/api/v1/myBids', async (req, res) => {
+        app.post('/api/v1/myBids', verifyToken, async (req, res) => {
             try {
                 const newBid = req.body;
                 console.log(req.user)
+                const queryEmail = req.query.email;
+                // console.log(queryEmail)
+                if (req.user.email !== queryEmail) {
+                    return res.status(403).send({ message: 'Forbiden Access' })
+                }
                 const result = await bidCollection.insertOne(newBid);
                 res.send(result)
             } catch (error) {
@@ -274,7 +286,7 @@ async function run() {
 
         // http://localhost:5000/api/v1/myBid
         // app.get('/api/v1/myBids', verifyToken, async (req, res) => {
-        app.get('/api/v1/myBids', async (req, res) => {
+        app.get('/api/v1/myBids', verifyToken, async (req, res) => {
             try {
                 const queryBidEmail = req.query.email;
                 const isReq = req.query?.isReq;
