@@ -104,13 +104,35 @@ async function run() {
         })
 
         // // Get user All Posted Jobs
+        // app.get('/api/v1/allJobs', async (req, res) => {
+        //     try {
+        //         const queryEmail = req.query.email;
+        //         const queryCat = req.query.cat;
+        //         console.log(queryEmail)
+        //         let query = {};
+        //         if (req.query.email) {
+        //             query = { email: { $ne: queryEmail }, category: queryCat };
+        //             let result = await jobsCollection.find(query).toArray();
+        //             res.send(result)
+        //         }
+        //         else {
+        //             result = await jobsCollection.find(query).toArray();
+        //             res.send(result)
+        //         }
+        //     } catch (error) {
+        //         console.log("error On /api/v1/AllJobs")
+        //         console.log(error)
+        //     }
+        // })
+
         app.get('/api/v1/allJobs', async (req, res) => {
             try {
-                const queryEmail = req.query.email;
-                console.log(queryEmail)
+                
+                const queryCat = req.query.cat;
+                console.log(queryCat)
                 let query = {};
-                if (req.query.email) {
-                    query = { email: { $ne: queryEmail } };
+                if (queryCat) {
+                    query = { category: queryCat };
                     let result = await jobsCollection.find(query).toArray();
                     res.send(result)
                 }
@@ -128,7 +150,7 @@ async function run() {
         app.get('/api/v1/allJobs/:id', verifyToken, async (req, res) => {
             try {
                 const id = req.params.id;
-                const queryEmail = req.query.email;
+                // const queryEmail = req.query.email;
                 // console.log(queryEmail)
                 let query = { _id: new ObjectId(id) };
                 // if (req.query.email) {
