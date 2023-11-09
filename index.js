@@ -295,9 +295,9 @@ async function run() {
                 console.log(req.user)
                 const queryEmail = req.query.email;
                 // console.log(queryEmail)
-                if (req.user.email !== queryEmail) {
-                    return res.status(403).send({ message: 'Forbiden Access' })
-                }
+                // if (req.user.email !== queryEmail) {
+                //     return res.status(403).send({ message: 'Forbiden Access' })
+                // }
                 const result = await bidCollection.insertOne(newBid);
                 res.send(result)
             } catch (error) {
